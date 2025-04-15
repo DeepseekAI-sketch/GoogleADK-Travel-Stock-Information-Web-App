@@ -3,12 +3,15 @@ Google Ads (Google AdWords) campaign promoting the Stock Information App by ADK 
 
 Here's a polished `README.md` for your **ADK Travel Stock Information Web App** (Python-based):
 
-```markdown
+![image](https://github.com/user-attachments/assets/3b508b56-2e4b-4634-a29e-3d171b9120b4)
+
+
+
 # 📈 ADK Travel Stock Information Web App  
 
 *A real-time stock market data dashboard built with Python, delivering financial insights at your fingertips.*  
 
-![image](https://github.com/user-attachments/assets/3552c4d0-0891-401d-b96b-7904a01ebb2e)
+
 
 
 
