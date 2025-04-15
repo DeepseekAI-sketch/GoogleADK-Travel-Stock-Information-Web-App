@@ -7,11 +7,16 @@ Here's a polished `README.md` for your **ADK Travel Stock Information Web App** 
 
 
 
+
 # 📈 ADK Travel Stock Information Web App  
 
 *A real-time stock market data dashboard built with Python, delivering financial insights at your fingertips.*  
 
 
+![image](https://github.com/user-attachments/assets/7dd40a29-fc6f-4bf5-b617-851b883657d3)
+
+
+![image](https://github.com/user-attachments/assets/53e15229-80b0-4756-8cf0-016436838213)
 
 
 
