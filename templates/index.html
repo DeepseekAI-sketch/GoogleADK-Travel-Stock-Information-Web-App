@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel & Stock Information App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <h1 class="text-3xl font-bold text-center text-blue-700 mb-8">Travel & Stock Information App</h1>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8" x-data="{
+            activeTab: 'travel',
+            cityInput: '',
+            symbolInput: '',
+            cityResults: null,
+            stockResults: null,
+            loadingCity: false,
+            loadingStock: false,
+            cityError: null,
+            stockError: null,
+            
+            // Mock data for demonstration
+            mockTravelData: {
+                'new york': {
+                    time: {
+                        status: 'success',
+                        report: 'The current time in New York is 2023-10-31 14:30:45 EDT-0400'
+                    },
+                    weather: {
+                        status: 'success',
+                        report: 'The weather in New York is Sunny, 25°C (77°F).'
+                    },
+                    airbnb: {
+                        status: 'success',
+                        listings: [
+                            {
+                                title: 'Cozy Studio in Manhattan',
+                                price_per_night: '$150',
+                                location_highlights: 'Close to Central Park and subway stations'
+                            },
+                            {
+                                title: 'Modern Loft in Brooklyn',
+                                price_per_night: '$120',
+                                location_highlights: 'Great nightlife and cafes nearby'
+                            }
+                        ]
+                    }
+                },
+                'san francisco': {
+                    time: {
+                        status: 'success',
+                        report: 'The current time in San Francisco is 2023-10-31 11:30:45 PDT-0700'
+                    },
+                    weather: {
+                        status: 'success',
+                        report: 'The weather in San Francisco is Foggy, 18°C (64°F).'
+                    },
+                    airbnb: {
+                        status: 'success',
+                        listings: [
+                            {
+                                title: 'Chic Apartment near Golden Gate Park',
+                                price_per_night: '$180',
+                                location_highlights: 'Quiet neighborhood, walkable to park'
+                            },
+                            {
+                                title: 'Sunny Mission District Flat',
+                                price_per_night: '$140',
+                                location_highlights: 'Vibrant area with restaurants and shops'
+                            }
+                        ]
+                    }
+                },
+                'london': {
+                    time: {
+                        status: 'success',
+                        report: 'The current time in London is 2023-10-31 18:30:45 GMT+0000'
+                    },
+                    weather: {
+                        status: 'success',
+                        report: 'The weather in London is Cloudy, 16°C (61°F).'
+                    },
+                    airbnb: {
+                        status: 'success',
+                        listings: [
+                            {
+                                title: 'Modern Flat in Notting Hill',
+                                price_per_night: '$200',
+                                location_highlights: 'Walking distance to Hyde Park and shops'
+                            },
+                            {
+                                title: 'Cozy Apartment in Shoreditch',
+                                price_per_night: '$170',
+                                location_highlights: 'Trendy area with great restaurants and nightlife'
+                            }
+                        ]
+                    }
+                },
+                'tokyo': {
+                    time: {
+                        status: 'success',
+                        report: 'The current time in Tokyo is 2023-11-01 03:30:45 JST+0900'
+                    },
+                    weather: {
+                        status: 'success',
+                        report: 'The weather in Tokyo is Rainy, 22°C (72°F).'
+                    },
+                    airbnb: {
+                        status: 'success',
+                        listings: [
+                            {
+                                title: 'Modern Apartment in Shibuya',
+                                price_per_night: '$160',
+                                location_highlights: 'Close to shopping and nightlife districts'
+                            },
+                            {
+                                title: 'Traditional Japanese House in Asakusa',
+                                price_per_night: '$130',
+                                location_highlights: 'Near temples and traditional markets'
+                            }
+                        ]
+                    }
+                }
+            },
+            
+            mockStockData: {
+                'AAPL': {
+                    status: 'success',
+                    symbol: 'AAPL',
+                    price: 150.65,
+                    company: 'Apple Inc.'
+                },
+                'GOOG': {
+                    status: 'success',
+                    symbol: 'GOOG',
+                    price: 2758.92,
+                    company: 'Alphabet Inc.'
+                },
+                'MSFT': {
+                    status: 'success',
+                    symbol: 'MSFT',
+                    price: 325.45,
+                    company: 'Microsoft Corporation'
+                },
+                'AMZN': {
+                    status: 'success',
+                    symbol: 'AMZN',
+                    price: 3349.63,
+                    company: 'Amazon.com, Inc.'
+                }
+            },
+            
+            // Methods for demonstration
+            searchCity() {
+                this.loadingCity = true;
+                this.cityError = null;
+                this.cityResults = null;
+                
+                setTimeout(() => {
+                    const cityKey = this.cityInput.toLowerCase();
+                    if (this.mockTravelData[cityKey]) {
+                        this.cityResults = this.mockTravelData[cityKey];
+                    } else {
+                        this.cityError = `No information available for '${this.cityInput}'.`;
+                    }
+                    this.loadingCity = false;
+                }, 800);
+            },
+            
+            searchStock() {
+                this.loadingStock = true;
+                this.stockError = null;
+                this.stockResults = null;
+                
+                setTimeout(() => {
+                    const symbolKey = this.symbolInput.toUpperCase();
+                    if (this.mockStockData[symbolKey]) {
+                        this.stockResults = this.mockStockData[symbolKey];
+                    } else {
+                        this.stockError = `No stock data available for '${this.symbolInput}'.`;
+                    }
+                    this.loadingStock = false;
+                }, 800);
+            }
+        }">
+            <!-- Tabs -->
+            <div class="flex mb-6">
+                <button @click="activeTab = 'travel'" class="flex-1 py-2 px-4 rounded-l-lg font-medium transition-colors" :class="activeTab === 'travel' ? 'bg-blue-600 text-white' : 'bg-gray-200'">
+                    <i class="fas fa-plane-departure mr-2"></i> Travel Information
+                </button>
+                <button @click="activeTab = 'stock'" class="flex-1 py-2 px-4 rounded-r-lg font-medium transition-colors" :class="activeTab === 'stock' ? 'bg-blue-600 text-white' : 'bg-gray-200'">
+                    <i class="fas fa-chart-line mr-2"></i> Stock Prices
+                </button>
+            </div>
+            
+            <!-- Travel Information Tab -->
+            <div x-show="activeTab === 'travel'">
+                <div class="mb-6">
+                    <form @submit.prevent="searchCity()">
+                        <div class="flex">
+                            <input 
+                                type="text" 
+                                x-model="cityInput" 
+                                placeholder="Enter city name (e.g., New York, San Francisco)" 
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button 
+                                type="submit" 
+                                class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors duration-200">
+                                <i class="fas fa-search mr-2"></i> Search
+                            </button>
+                        </div>
+                    </form>
+                    <p class="text-sm text-gray-600 mt-2">
+                        <i class="fas fa-info-circle mr-1"></i> Try cities like: New York, San Francisco, London, Tokyo
+                    </p>
+                </div>
+                
+                <!-- Loading State -->
+                <div x-show="loadingCity" class="text-center py-6">
+                    <i class="fas fa-spinner fa-spin text-blue-600 text-2xl"></i>
+                    <p class="text-gray-600 mt-2">Loading travel information...</p>
+                </div>
+                
+                <!-- Error Message -->
+                <div x-show="cityError" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                    <p x-text="cityError"></p>
+                </div>
+                
+                <!-- Results -->
+                <div x-show="cityResults && !loadingCity">
+                    <h2 class="text-xl font-semibold mb-4 text-blue-800 border-b pb-2" x-text="`Travel Information for ${cityInput}`"></h2>
+                    
+                    <!-- Time Information -->
+                    <div x-show="cityResults.time" class="mb-6">
+                        <h3 class="text-lg font-medium mb-2 flex items-center">
+                            <i class="far fa-clock mr-2 text-blue-600"></i> Time Information
+                        </h3>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p x-show="cityResults.time.status === 'success'" x-text="cityResults.time.report" class="text-gray-800"></p>
+                            <p x-show="cityResults.time.status === 'error'" x-text="cityResults.time.error_message" class="text-red-600"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Weather Information -->
+                    <div x-show="cityResults.weather" class="mb-6">
+                        <h3 class="text-lg font-medium mb-2 flex items-center">
+                            <i class="fas fa-cloud-sun mr-2 text-blue-600"></i> Weather Information
+                        </h3>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p x-show="cityResults.weather.status === 'success'" x-text="cityResults.weather.report" class="text-gray-800"></p>
+                            <p x-show="cityResults.weather.status === 'error'" x-text="cityResults.weather.error_message" class="text-red-600"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Airbnb Listings -->
+                    <div x-show="cityResults.airbnb" class="mb-6">
+                        <h3 class="text-lg font-medium mb-2 flex items-center">
+                            <i class="fas fa-home mr-2 text-blue-600"></i> Airbnb Listings
+                        </h3>
+                        
+                        <div x-show="cityResults.airbnb.status === 'success'">
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <template x-for="(listing, index) in cityResults.airbnb.listings" :key="index">
+                                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                                        <h4 class="font-semibold text-blue-800 mb-2" x-text="listing.title"></h4>
+                                        <p class="text-gray-800 mb-1">
+                                            <i class="fas fa-tag mr-1 text-blue-600"></i>
+                                            <span x-text="listing.price_per_night"></span> per night
+                                        </p>
+                                        <p class="text-gray-800">
+                                            <i class="fas fa-map-marker-alt mr-1 text-blue-600"></i>
+                                            <span x-text="listing.location_highlights"></span>
+                                        </p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        
+                        <div x-show="cityResults.airbnb.status === 'error'" class="bg-red-50 p-4 rounded-lg">
+                            <p class="text-red-600" x-text="cityResults.airbnb.error_message"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stock Prices Tab -->
+            <div x-show="activeTab === 'stock'">
+                <div class="mb-6">
+                    <form @submit.prevent="searchStock()">
+                        <div class="flex">
+                            <input 
+                                type="text" 
+                                x-model="symbolInput" 
+                                placeholder="Enter stock symbol (e.g., AAPL, GOOG)" 
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button 
+                                type="submit" 
+                                class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors duration-200">
+                                <i class="fas fa-search-dollar mr-2"></i> Get Price
+                            </button>
+                        </div>
+                    </form>
+                    <p class="text-sm text-gray-600 mt-2">
+                        <i class="fas fa-info-circle mr-1"></i> Try stock symbols like: AAPL (Apple), GOOG (Google), MSFT (Microsoft), AMZN (Amazon)
+                    </p>
+                </div>
+                
+                <!-- Loading State -->
+                <div x-show="loadingStock" class="text-center py-6">
+                    <i class="fas fa-spinner fa-spin text-blue-600 text-2xl"></i>
+                    <p class="text-gray-600 mt-2">Loading stock information...</p>
+                </div>
+                
+                <!-- Error Message -->
+                <div x-show="stockError" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                    <p x-text="stockError"></p>
+                </div>
+                
+                <!-- Stock Results -->
+                <div x-show="stockResults && !loadingStock">
+                    <h2 class="text-xl font-semibold mb-4 text-blue-800 border-b pb-2" x-text="`Stock Information for ${stockResults.company} (${stockResults.symbol})`"></h2>
+                    
+                    <div x-show="stockResults.status === 'success'" class="bg-green-50 p-6 rounded-lg border border-green-100">
+                        <div class="flex items-center justify-center">
+                            <i class="fas fa-chart-line text-4xl text-green-600 mr-4"></i>
+                            <div>
+                                <p class="text-lg text-gray-700">Current Price:</p>
+                                <p class="text-3xl font-bold text-green-700">$<span x-text="stockResults.price.toFixed(2)"></span></p>
+                                <p class="text-sm text-gray-600 mt-2" x-text="`As of ${new Date().toLocaleString()}`"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div x-show="stockResults.status === 'error'" class="bg-red-50 p-4 rounded-lg">
+                        <p class="text-red-600" x-text="stockResults.error_message"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4 text-blue-800">About This Application</h2>
+            <p class="mb-4">
+                This application integrates travel information services and stock price lookups in a single interface. The original version was built with Flask and uses several APIs to retrieve real-time data.
+            </p>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-blue-700 mb-2">Travel Information Features</h3>
+                    <ul class="list-disc pl-5 text-gray-700">
+                        <li>Current time in different time zones</li>
+                        <li>Local weather conditions</li>
+                        <li>Available Airbnb accommodation listings</li>
+                    </ul>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-blue-700 mb-2">Stock Information Features</h3>
+                    <ul class="list-disc pl-5 text-gray-700">
+                        <li>Real-time stock price lookup</li>
+                        <li>Support for major stock symbols</li>
+                        <li>Price displayed with company information</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-6 bg-gray-50 p-4 rounded-lg">
+                <h3 class="font-medium text-blue-700 mb-2">Implementation Notes</h3>
+                <p class="text-gray-700">
+                    This demo version uses mock data to simulate the functionality of the original Flask application. In the actual implementation, the data would be retrieved from real APIs:
+                </p>
+                <ul class="list-disc pl-5 mt-2 text-gray-700">
+                    <li>Weather data from weather service APIs</li>
+                    <li>Time zone information from time services</li>
+                    <li>Accommodation listings from Airbnb or similar APIs</li>
+                    <li>Stock prices from Yahoo Finance or similar financial data providers</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mt-8">
+            <h2 class="text-xl font-semibold mb-4 text-blue-800">Flask Implementation Details</h2>
+            <p class="mb-4">
+                The original application was implemented using Flask, a Python web framework. Below is an overview of the key components:
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-blue-700 mb-2">Backend Components</h3>
+                    <ul class="list-disc pl-5 text-gray-700">
+                        <li>Flask routes for handling API requests</li>
+                        <li>Integration with yfinance for stock data</li>
+                        <li>Custom functions for travel information</li>
+                        <li>Environment variable management with dotenv</li>
+                    </ul>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-blue-700 mb-2">Frontend Components</h3>
+                    <ul class="list-disc pl-5 text-gray-700">
+                        <li>HTML templates with Bootstrap styling</li>
+                        <li>JavaScript for asynchronous API calls</li>
+                        <li>Dynamic content rendering based on API responses</li>
+                        <li>Responsive design for various screen sizes</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-6 bg-gray-50 p-4 rounded-lg">
+                <h3 class="font-medium text-blue-700 mb-2">Code Structure</h3>
+                <p class="text-gray-700">
+                    The Flask application code was organized as follows:
+                </p>
+                <ol class="list-decimal pl-5 mt-2 text-gray-700">
+                    <li>Environment setup and imports</li>
+                    <li>Flask application initialization</li>
+                    <li>Travel information functions (Airbnb, time, weather)</li>
+                    <li>Stock price retrieval function</li>
+                    <li>API routes for frontend access</li>
+                    <li>Template generation for frontend</li>
+                    <li>Application entry point</li>
+                </ol>
+            </div>
+        </div>
+        
+        <footer class="text-center text-gray-600 mt-8 pb-4">
+            <p>© 2023 Travel & Stock Information App | Built with HTML, Alpine.js and Tailwind CSS</p>
+        </footer>
+    </div>
+</body>
+</html>
